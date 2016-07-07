@@ -1,11 +1,12 @@
 <?php
 
-class RntAuth {
+class RntAuthorisation {
 
 	private $db_dir = null;
 	private $db_table_users = null;
 	private $db_admin_user = null;
 	private $db_admin_pass = null;
+	private $db_session_time = null;
 
 	private $db;
 	private $error;
@@ -23,11 +24,12 @@ class RntAuth {
 	}
 
 	//inicjalizacja
-	public function init($_db_dir, $_db_table_users, $_db_admin_user, $_db_admin_pass) {
+	public function init($_db_dir, $_db_table_users, $_db_admin_user, $_db_admin_pass, $_db_session_time) {
 		$this->db_dir = $_db_dir;
 		$this->db_table_users = $_db_table_users;
 		$this->db_admin_user = $_db_admin_user;
 		$this->db_admin_pass = $_db_admin_pass;
+		$this->db_session_time = $_db_session_time;
 
 		try {
 			$this->db = new PDO('sqlite:' . $this->db_dir);
@@ -43,10 +45,16 @@ class RntAuth {
 				$sql = sprintf("CREATE TABLE '%s' (
 					'id'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 					'user'	TEXT NOT NULL UNIQUE,
-					'pass'	TEXT NOT NULL);", $this->db_table_users);
+					'pass'	TEXT NOT NULL,
+					'session_time' INTEGER NOT NULL);", $this->db_table_users);
 				$this->db->exec($sql);
 
-				$sql = sprintf("INSERT INTO %s(user, pass) VALUES('%s', '%s')", $this->db_table_users, $this->db_admin_user, password_hash($this->db_admin_pass, PASSWORD_DEFAULT));
+				$sql = sprintf("INSERT INTO %s(user, pass, session_time) VALUES('%s', '%s', '%s')",
+					$this->db_table_users,
+					$this->db_admin_user,
+					password_hash($this->db_admin_pass, PASSWORD_DEFAULT),
+					$this->db_session_time);
+
 				$this->db->exec($sql);
 			}
 		} catch(PDOException $e) {
@@ -69,7 +77,24 @@ class RntAuth {
 		if($result) return $result['user'];
 		else {
 			$this->error = 'Brak użytkownika o podanym ID';
-			return null;
+			return false;
+		}
+	}
+
+	//pobieranie nazwy uzytkownia z bazy danych
+	public function getUserSessionTime($_id) {
+		try {
+			$sql = sprintf("SELECT session_time FROM %s WHERE id=%s", $this->db_table_users, $this->isInt($_id));
+			$result = $this->db->query($sql)->fetch();
+		} catch(PDOException $e) {
+			$this->error = $e->getMessage();
+			return false;
+		}
+
+		if($result) return (int) $result['session_time'];
+		else {
+			$this->error = 'Brak użytkownika o podanym ID';
+			return false;
 		}
 	}
 
@@ -98,5 +123,4 @@ class RntAuth {
 
 
 }
-
 ?>

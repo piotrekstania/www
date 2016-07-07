@@ -1,15 +1,32 @@
 <?php
 
-require('RntAuth.php');
+require('RntSession.php');
 
-$auth = new RntAuth();
+$s = new RntSession();
 
-if(!$auth->init('baza.db', 'users', 'admin', 'admin')) echo $auth->getError();
+if($s->isLogin()) {
+	echo 'User: ' . $s->getUserName() . '<br>';
+	echo 'Info: ' . $s->getMessage() . '<br>';
 
+	echo '
+		<form action="index.php" method="post">
+	  	<button type="submit" name="logout">wyloguj</button>
+	</form>
+		';
 
-$id = $auth->getUserId('admin', 'admin');
+} else {
+	echo 'User: ' . $s->getUserName() . '<br>';
+	echo 'Info: ' . $s->getMessage() . '<br>';
 
-if($id) echo $auth->getUserName($id);
-else echo $auth->getError();
+echo '
+	<form action="index.php" method="post">
+  	user: <input type="text" name="login"><br>
+  	pass: <input type="text" name="pass"><br>
+  	<button type="submit">zaloguj</button>
+</form>
+	';
+
+}
+
 
 ?>
