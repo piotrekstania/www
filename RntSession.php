@@ -36,12 +36,21 @@ class RntSession {
 
 		session_start();
 
-		//pierwsza wizyta niezalogowanego uzytkownia
-		if(!isset($_SESSION['id']) || !isset($_SESSION['init'])) {
-
+		if (!isset($_SESSION['init'])) {
 			session_regenerate_id();
 			$_SESSION['init'] = true;
 			$_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
+		}
+
+		//niezgodnosc ip, automatyczne wylogowanie
+		if($_SESSION['ip'] != $_SERVER['REMOTE_ADDR']) {
+			$this->message = "Niezgodność IP. Zaloguj się ponownie.";
+			$this->killSession();
+			return false;
+		}
+
+		//pierwsza wizyta niezalogowanego uzytkownia
+		if(!isset($_SESSION['id'])) {
 			$_SESSION['id'] = 0;
 		}
 
@@ -50,7 +59,7 @@ class RntSession {
 
 			//wylogowywanie
 			if(isset($_POST['logout'])) {
-				$this->message = "Poprawne wylogowanie. Zaloguj się ponownie.";
+				$this->message = "Poprawne wylogowanie.";
 				$this->killSession();
 				return false;
 			}
@@ -67,23 +76,13 @@ class RntSession {
 
 				//zalogowany poprawnie
 				$_SESSION['id'] = $id;
-				$this->message = "Poprawne zalogowanie.";
 				$_SESSION['time'] = time();
-
-				return true;
 			}
 		}
 
 		//kolejna wizyta niezalogowanego uzytkownika
 		if($_SESSION['id'] == 0) {
 			$this->message = "Użytkownik niezalogowany.";
-			return false;
-		}
-
-		//niezgodnosc ip, automatyczne wylogowanie
-		if($_SESSION['ip'] != $_SERVER['REMOTE_ADDR']) {
-			$this->message = "Niezgodność IP. Zaloguj się ponownie.";
-			$this->killSession();
 			return false;
 		}
 
@@ -96,19 +95,26 @@ class RntSession {
 			}
 		}
 
-		$this->message = "Wszytsko OK.";
+		$this->message = "Zalogowany jako " . $this->getUserName();
 		$_SESSION['time'] = time();
 
 		return true;
 	}
 
 	public function getUserName() {
-		if($this->auth && isset($_SESSION['id'])) return $this->auth->getUserName($_SESSION['id']);
+		if(isset($this->auth) && isset($_SESSION['id'])) return $this->auth->getUserName($_SESSION['id']);
 		return false;
 	}
 
 	public function getMessage() {
 		return $this->message;
+	}
+
+	public function isAdmin() {
+		if(isset($_SESSION['id']) && isset($this->auth)) {
+			if(($_SESSION['id'] == 1) && ($this->auth->getUserName($_SESSION['id']) == $this->db_admin_user)) return true;
+		}
+		return false;
 	}
 
 }

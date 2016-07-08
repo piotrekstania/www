@@ -11,7 +11,7 @@ class RntAuthorisation {
 	private $db;
 	private $error;
 
-	//funkcja sprawdza czy podana zmienna jest liczbą
+	//funkcja sprawdza czy podana zmienna jest liczbą, jak nie to zwraca stirng NULL
 	private function isInt($var) {
 			if(empty($var)) return 'NULL';
 			else if(!is_numeric($var)) return 'NULL';

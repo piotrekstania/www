@@ -5,20 +5,16 @@ require('RntSession.php');
 $s = new RntSession();
 
 if($s->isLogin()) {
-	echo 'User: ' . $s->getUserName() . '<br>';
-	echo 'Info: ' . $s->getMessage() . '<br>';
 
-	echo '
+	$form = '
 		<form action="index.php" method="post">
-	  	<button type="submit" name="logout">wyloguj</button>
+	  	<button type="submit" name="logout" value="true">wyloguj</button>
 	</form>
 		';
 
 } else {
-	echo 'User: ' . $s->getUserName() . '<br>';
-	echo 'Info: ' . $s->getMessage() . '<br>';
 
-echo '
+$form = '
 	<form action="index.php" method="post">
   	user: <input type="text" name="login"><br>
   	pass: <input type="text" name="pass"><br>
@@ -27,6 +23,14 @@ echo '
 	';
 
 }
+
+if($s->isAdmin()) echo "Admin";
+else echo "noAdmin";
+
+echo "<br>" . $s->getMessage() . '<br>';
+echo $form;
+
+
 
 
 ?>
