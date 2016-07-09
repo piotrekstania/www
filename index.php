@@ -1,36 +1,48 @@
 <?php
 
-require('RntSession.php');
+require('RntUsers.php');
 
-$s = new RntSession();
 
-if($s->isLogin()) {
+try {
+	$s = new RntUsers();
 
-	$form = '
-		<form action="index.php" method="post">
-	  	<button type="submit" name="logout" value="true">wyloguj</button>
-	</form>
-		';
+	if($s->isLogin()) {
+		$form = '<form action="index.php" method="post">
+							<input type="hidden" name="type" value="logout">
+		  				<button type="submit">wyloguj</button>
+						</form>';
 
-} else {
+			$form .= '<br>
+				<form action="index.php" method="post">
+					<input type="hidden" name="type" value="adduser">
+					user: <input type="text" name="user"><br>
+			  	pass: <input type="text" name="pass"><br>
+					session_time: <input type="number" name="session_time"><br>
+			  	<button type="submit">dodaj</button>
+			</form>
+				<br>';
 
-$form = '
-	<form action="index.php" method="post">
-  	user: <input type="text" name="login"><br>
-  	pass: <input type="text" name="pass"><br>
-  	<button type="submit">zaloguj</button>
-</form>
-	';
+			} else {
 
+			$form = '
+				<form action="index.php" method="post">
+					<input type="hidden" name="type" value="login">
+					user: <input type="text" name="user"><br>
+					pass: <input type="text" name="pass"><br>
+					<button type="submit">zaloguj</button>
+			</form>
+				';
+
+
+
+			}
+
+
+			echo "<br>" . $s->getMessage() . '<br>';
+			echo $form;
+
+
+}catch(Exception $e) {
+	echo $e->getMessage();
 }
-
-if($s->isAdmin()) echo "Admin";
-else echo "noAdmin";
-
-echo "<br>" . $s->getMessage() . '<br>';
-echo $form;
-
-
-
-
 ?>
