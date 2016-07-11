@@ -41,8 +41,7 @@ if($s->isLogin()) {
 	$form .= '<form action="index.php" method="post">
 						<input type="hidden" name="type" value="change_pass">
 						old: <input type="text" name="old_pass"><br>
-						new1: <input type="password" name="new_pass_1"><br>
-						new2: <input type="password" name="new_pass_2"><br>
+						new: <input type="password" name="new_pass"><br>
 	  				<button type="submit">zmień</button>
 					</form>';
 

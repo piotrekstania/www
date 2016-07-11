@@ -132,7 +132,7 @@ class RtUsers {
 						return;
 					}
 
-					if(empty($_POST['old_pass']) || empty($_POST['new_pass_1']) || empty($_POST['new_pass_2'])) {
+					if(empty($_POST['old_pass']) || empty($_POST['new_pass'])) {
 						$this->message = "Niepoprawne dane.";
 						return;
 					}
@@ -142,12 +142,12 @@ class RtUsers {
 						$sql = sprintf("SELECT * FROM %s WHERE id=%u", $this->db_table_users, $_SESSION['id']);
 						$result = $this->db->query($sql)->fetch();
 
-						if(!password_verify($_POST['old_pass'], $result['pass']) || ($_POST['new_pass_1'] != $_POST['new_pass_2'])) {
+						if(!password_verify($_POST['old_pass'], $result['pass'])) {
 							$this->message = "Niepoprawne dane.";
 							return;
 						}
 
-						$sql = sprintf("UPDATE %s SET pass='%s' WHERE id=%u", $this->db_table_users, password_hash($_POST['new_pass_1'], PASSWORD_DEFAULT), $_SESSION['id']);
+						$sql = sprintf("UPDATE %s SET pass='%s' WHERE id=%u", $this->db_table_users, password_hash($_POST['new_pass'], PASSWORD_DEFAULT), $_SESSION['id']);
 
 						if($this->db->exec($sql)) $this->message = "Hasło zostało zmienione.";
 						else $this->message = "Niepoprawne dane.";
