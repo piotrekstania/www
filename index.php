@@ -2,11 +2,11 @@
 
 function build_table($array){
     // start table
-    $html = '<table>';
+    $html = '<table style="text-align: end;">';
     // header row
     $html .= '<tr>';
     foreach($array[0] as $key=>$value){
-            $html .= '<th>' . $key . '</th>';
+            $html .= '<th style="padding-right: 50px;">' . $key . '</th>';
         }
     $html .= '</tr>';
 
@@ -14,7 +14,7 @@ function build_table($array){
     foreach( $array as $key=>$value){
         $html .= '<tr>';
         foreach($value as $key2=>$value2){
-            $html .= '<td>' . $value2 . '</td>';
+            $html .= '<td style="padding-right: 50px;">' . $value2 . '</td>';
         }
         $html .= '</tr>';
     }
@@ -30,7 +30,8 @@ require('RtUsers.php');
 $s = new RtUsers();
 
 if($s->isLogin()) {
-	$form = '<form action="index.php" method="post">
+	$form = 'Zalogowany jako: ' . $s->getUserName() . '<br>';
+	$form .= '<form action="index.php" method="post">
 						<input type="hidden" name="type" value="logout">
 	  				<button type="submit">wyloguj</button>
 					</form>';
@@ -54,7 +55,7 @@ if($s->isLogin()) {
 						  	<button type="submit">dodaj</button>
 						</form><br>';
 
-						$form .= build_table($s->getUsers());
+						if($x = $s->getUsers()) $form .= build_table($x);
 
 						$form .= '<br>
 							<form action="index.php" method="post">
@@ -67,7 +68,8 @@ if($s->isLogin()) {
 
 
 		} else {
-		$form = '
+				$form = 'Niezalogowany<br>';
+		$form .= '
 			<form action="index.php" method="post">
 				<input type="hidden" name="type" value="login">
 				user: <input type="text" name="user"><br>
@@ -78,7 +80,6 @@ if($s->isLogin()) {
 
 
 		echo "<br>" . $s->getMessage() . '<br>';
-		echo "zalogowany jako " . $s->getUserName() . "<br>";
 		echo $form;
 
 ?>

@@ -7,16 +7,13 @@ class RtUsers {
 	private $db_admin_user   = "admin";
 	private $db_admin_pass   = "admin";
 
-	private $session_time = 60;
+	private $session_time = 3600;
 
 	private $message;
-	private $user_name;
 
 	function __construct() {
 
 		session_start();
-
-		$this->message = "Użytkownik niezalogowny.";
 
 		//brak inicjalizacji -> wygenerowanie nowgo id
 		if (!isset($_SESSION['init'])) {
@@ -28,7 +25,7 @@ class RtUsers {
 		//niezgodnosc ip, automatyczne wylogowanie
 		if($_SESSION['ip'] != $_SERVER['REMOTE_ADDR']) {
 			$_SESSION = array();
-			$this->message = "Niezgodność IP.";
+			$this->message = "Niezgodność IP. Zaloguj się ponownie.";
 			return;
 		}
 
@@ -41,7 +38,7 @@ class RtUsers {
 		if($_SESSION['id'] > 0) {
 			if($_SESSION['time'] < (time()-$this->session_time)) {
 				$_SESSION = array();
-				$this->message = "Sesja wygasła.";
+				$this->message = "Sesja wygasła. Zaloguj się ponownie.";
 				return;
 			} else $_SESSION['time'] = time();
 		}
@@ -63,7 +60,9 @@ class RtUsers {
 				$sql = sprintf("CREATE TABLE '%s' (
 					'id'	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 					'user'	TEXT NOT NULL UNIQUE,
-					'pass'	TEXT NOT NULL);", $this->db_table_users);
+					'pass'	TEXT NOT NULL,
+					'count' INTEGER DEFAULT 0,
+					'last_login' INTEGER DEFAULT 0);", $this->db_table_users);
 				$this->db->exec($sql);
 			}
 
@@ -95,22 +94,34 @@ class RtUsers {
 					return;
 
 				case 'login':
-					try {
-						$sql = sprintf("SELECT * FROM %s WHERE user='%s'", $this->db_table_users, $_POST['user']);
-						$result = $this->db->query($sql)->fetch();
-					} catch(PDOException $e) {
-						$this->message = $e->getMessage();
+					if(empty($_POST['user']) || empty($_POST['pass'])) {
+						$this->message = "Niepoprawne dane.";
 						return;
 					}
 
-					if(password_verify($_POST['pass'], $result['pass'])) {
-						session_regenerate_id();
-						$_SESSION['init'] = true;
-						$_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
-						$_SESSION['id'] = $result['id'];
-						$_SESSION['time'] = time();
-					} else {
-						$this->message = "Niepoprawne dane.";
+					try {
+						$sql = sprintf("SELECT * FROM %s WHERE user='%s'", $this->db_table_users, $_POST['user']);
+						$result = $this->db->query($sql)->fetch();
+
+						if(password_verify($_POST['pass'], $result['pass'])) {
+							session_regenerate_id();
+							$_SESSION['init'] = true;
+							$_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
+							$_SESSION['id'] = $result['id'];
+							$_SESSION['time'] = time();
+
+							$sql = sprintf("UPDATE %s SET count=count+1, last_login=%u WHERE id=%u", $this->db_table_users, time(), $_SESSION['id']);
+							$this->db->exec($sql);
+
+							$this->message = "Poprawnie zalogowano.";
+
+						} else {
+							$this->message = "Niepoprawne dane.";
+							return;
+						}
+
+					} catch(PDOException $e) {
+						$this->message = $e->getMessage();
 						return;
 					}
 					break;
@@ -120,6 +131,12 @@ class RtUsers {
 						$this->message = "Brak uprawnień.";
 						return;
 					}
+
+					if(empty($_POST['old_pass']) || empty($_POST['new_pass_1']) || empty($_POST['new_pass_2'])) {
+						$this->message = "Niepoprawne dane.";
+						return;
+					}
+
 
 					try {
 						$sql = sprintf("SELECT * FROM %s WHERE id=%u", $this->db_table_users, $_SESSION['id']);
@@ -199,8 +216,6 @@ class RtUsers {
 
 				}
 			}
-
-			if($_SESSION['id'] > 0) $this->message = "Użytkownik zalogowny.";
 		}
 
 
@@ -220,7 +235,8 @@ class RtUsers {
 	}
 
 	public function getMessage() {
-		return $this->message;
+		if($this->message) return $this->message;
+		return false;
 	}
 
 	public function getUserName() {
@@ -245,7 +261,7 @@ class RtUsers {
 		if($_SESSION['id'] != 1) return false;
 
 		try {
-			$sql = sprintf("SELECT id, user FROM %s", $this->db_table_users);
+			$sql = sprintf("SELECT id AS 'ID', user AS 'Login', datetime(last_login, 'unixepoch', 'localtime') AS 'Ostatnie logowanie', count AS 'Logowań' FROM %s", $this->db_table_users);
 			$result = $this->db->query($sql)->fetchAll();
 			if($result) return $result;
 		} catch(PDOException $e) {
