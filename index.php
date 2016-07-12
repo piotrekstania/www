@@ -78,7 +78,8 @@ if($s->isLogin()) {
 		}
 
 
-		echo "<br>" . $s->getMessage() . '<br>';
+		echo $s->getMessage() . '<br><br>';
+		echo "<a href='index.php'>Index</a><br>";
 		echo $form;
 
 ?>
