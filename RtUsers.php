@@ -132,7 +132,12 @@ class RtUsers {
 						return;
 					}
 
-					if(empty($_POST['old_pass']) || empty($_POST['new_pass'])) {
+					if(empty($_POST['old_pass']) || empty($_POST['new_pass']) || empty($_POST['conf_pass'])) {
+						$this->message = "Niepoprawne dane.";
+						return;
+					}
+
+					if($_POST['new_pass'] != $_POST['conf_pass']) {
 						$this->message = "Niepoprawne dane.";
 						return;
 					}
