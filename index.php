@@ -1,94 +1,14 @@
 <?php
-/*
-function build_table($array){
-    // start table
-    $html = '<table style="text-align: end;">';
-    // header row
-    $html .= '<tr>';
-    foreach($array[0] as $key=>$value){
-            $html .= '<th style="padding-right: 50px;">' . $key . '</th>';
-        }
-    $html .= '</tr>';
+require('php/RtUsers.php');
 
-    // data rows
-    foreach( $array as $key=>$value){
-        $html .= '<tr>';
-        foreach($value as $key2=>$value2){
-            $html .= '<td style="padding-right: 50px;">' . $value2 . '</td>';
-        }
-        $html .= '</tr>';
-    }
+$user = new RtUsers();
 
-    // finish table and return it
-
-    $html .= '</table>';
-    return $html;
-}
-
-require('RtUsers.php');
-
-$s = new RtUsers();
-
-if($s->isLogin()) {
-	$form = 'Zalogowany jako: ' . $s->getUserName() . '<br>';
-	$form .= '<form action="index.php" method="post">
-						<input type="hidden" name="type" value="logout">
-	  				<button type="submit">wyloguj</button>
-					</form>';
-
-	$form .= '<br>';
-
-	$form .= '<form action="index.php" method="post">
-						<input type="hidden" name="type" value="change_pass">
-						old: <input type="text" name="old_pass"><br>
-						new: <input type="password" name="new_pass"><br>
-						new: <input type="password" name="conf_pass"><br>
-	  				<button type="submit">zmień</button>
-					</form>';
-
-					if($s->isAdmin()){
-						$form .= '<br>
-							<form action="index.php" method="post">
-								<input type="hidden" name="type" value="add_user">
-								user: <input type="text" name="user"><br>
-						  	pass: <input type="text" name="pass"><br>
-						  	<button type="submit">dodaj</button>
-						</form><br>';
-
-						if($x = $s->getUsers()) $form .= build_table($x);
-
-						$form .= '<br>
-							<form action="index.php" method="post">
-								<input type="hidden" name="type" value="remove_user">
-								id: <input type="text" name="id"><br>
-						  	<button type="submit">usuń</button>
-						</form><br>';
-
-					}
+if(isset($_GET['site'])) $site = $_GET['site'];
+else $site = 'panel';
 
 
-		} else {
-				$form = 'Niezalogowany<br>';
-		$form .= '
-			<form action="index.php" method="post">
-				<input type="hidden" name="type" value="login">
-				user: <input type="text" name="user"><br>
-				pass: <input type="password" name="pass"><br>
-				<button type="submit">zaloguj</button>
-		</form>';
-		}
-
-
-		echo $s->getMessage() . '<br><br>';
-		echo "<a href='index.php'>Index</a><br>";
-		echo $form;
-*/
-
-require('RtUsers.php');
-
-$users = new RtUsers();
+$message = $user->getMessage();
 ?>
-
 <!doctype html>
 <!--
   Material Design Lite
@@ -118,27 +38,21 @@ $users = new RtUsers();
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.cyan-light_blue.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.blue_grey-pink.min.css">
+    <link rel="stylesheet" href="css/styles.css">
   </head>
 
 	<body>
-	<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+
+		<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
 
 		<header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
 			<div class="mdl-layout__header-row">
-				<span class="mdl-layout-title">Home</span>
+				<span class="mdl-layout-title">
+					<?php echo ucfirst($site); ?>
+				</span>
+
 				<div class="mdl-layout-spacer"></div>
-
-				<button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
-					<i class="material-icons">more_vert</i>
-				</button>
-
-				<ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-					<li class="mdl-menu__item">About</li>
-					<li class="mdl-menu__item">Contact</li>
-					<li class="mdl-menu__item">Legal information</li>
-				</ul>
 
 			</div>
 		</header>
@@ -151,52 +65,85 @@ $users = new RtUsers();
 		<div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
 
 			<header class="demo-drawer-header">
+          <div class="demo-avatar-dropdown">
+
+						<?php
+							if($user->isLogin()) {
+
+								echo '<span>' . $user->getUserName() . '</span>';
+								echo
+									'<div class="mdl-layout-spacer"></div>
+
+									<button class="mdl-button mdl-js-button mdl-button--icon" onclick="location.href=' . "'/konto'" . ';" id="button-konto">
+  									<i class="material-icons">settings</i>
+									</button>
+									<div class="mdl-tooltip" for="button-konto">Ustawienia konta</div>
+
+									<div style="width:10px;"></div>
+
+									<form action="/" method="post" id="logout">
+										<input type="hidden" name="type" value="logout">
+										<button class="mdl-button mdl-js-button mdl-button--icon" onclick="logout.submit();" id="button-logout">
+	  									<i class="material-icons">power_settings_new</i>
+										</button>
+										<div class="mdl-tooltip" for="button-logout">Wyloguj</div>
+									</form>';
+
+							} else {
+								echo '<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="location.href=' . "'logowanie'" . ';">Zaloguj się</button>';
+							}
+
+						?>
 
 
-					<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-	    			<input class="mdl-textfield__input" type="text" id="user">
-	    			<label class="mdl-textfield__label" for="user">Login</label>
-	  			</div>
 
-					<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-	    			<input class="mdl-textfield__input" type="password" id="pass">
-	    			<label class="mdl-textfield__label" for="pass">Hasło</label>
-	  			</div>
-
-
-			</header>
+          </div>
+        </header>
 
 
 			<nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
-				<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
-				<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Inbox</a>
-				<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>Trash</a>
-				<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">report</i>Spam</a>
-				<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">forum</i>Forums</a>
-				<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">flag</i>Updates</a>
-				<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">local_offer</i>Promos</a>
-				<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">shopping_cart</i>Purchases</a>
-				<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">people</i>Social</a>
+				<a class="mdl-navigation__link" href="/panel"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">dashboard</i>Panel</a>
+				<a class="mdl-navigation__link" href="/archiwum"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">archive</i>Archiwum</a>
+				<a class="mdl-navigation__link" href="/ustawienia"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">settings</i>Ustawienia</a>
 				<div class="mdl-layout-spacer"></div>
-				<a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">help_outline</i><span class="visuallyhidden">Help</span></a>
+				<a class="mdl-navigation__link" href="/kontakt"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">contact_phone</i>Kontakt</a>
+				<a class="mdl-navigation__link" href="/licencje"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">copyright</i>Licencje</a>
 			</nav>
 		</div>
 
 
 
+			<main class="mdl-layout__content mdl-color--grey-100" style="display:flex;">
+				<?php
+					$file = "sites/" . $site . ".php";
+					if(file_exists($file)) include_once($file);
+				?>
+			</main>
 
-
-
-		<main class="mdl-layout__content mdl-color--grey-100">
-
-			<div class="mdl-grid demo-content">
-
-			</div>
-		</main>
-
-	</div>
-
+		</div>
 
 		<script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+
+		<?php
+			if($message) {
+				echo '<div id="toast" class="mdl-js-snackbar mdl-snackbar">
+								<div class="mdl-snackbar__text"></div>
+								<button type="button" class="mdl-snackbar__action"></button>
+							</div>
+
+							<script>
+								function message() {
+									var notification = document.getElementById("toast");
+									notification.MaterialSnackbar.showSnackbar(
+										{
+	    								message: "' . $message . '",
+											timeout: 2000
+	  								}
+									);
+								}
+								window.onload = message;
+							</script>';
+			}
+		?>
 	</body>
 </html>
