@@ -1,6 +1,6 @@
 <?php
 if($user->isLogin()) {
-	header("Location: /panel");
+	header("Location: /");
 	die();
 }
 ?>

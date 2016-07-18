@@ -2,12 +2,27 @@
 require('php/RtUsers.php');
 
 $user = new RtUsers();
-
-if(isset($_GET['site'])) $site = $_GET['site'];
-else $site = 'panel';
-
-
 $message = $user->getMessage();
+
+$sitesDir = "sites/";
+
+
+if(isset($_GET['site'])) {
+
+	if(file_exists($sitesDir . $_GET['site'] . ".php")) {
+		$site = $_GET['site'];
+		$file = $sitesDir . $_GET['site'] . ".php";
+	} else {
+		$site = "Błąd 404";
+		$message = "Podana strona nie istnieje";
+		$file = null;
+	}
+
+} else {
+	$site = 'panel';
+	$file = $sitesDir . $site . ".php";
+}
+
 ?>
 <!doctype html>
 <!--
@@ -32,41 +47,32 @@ $message = $user->getMessage();
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Panel HPS521">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <title>Otech - HPS521</title>
+		<?php if(strpos($site, "404")) echo '<meta http-equiv="refresh" content="3;url=/"/>' ?>
+    <title>Nazwa maszyny</title>
 
-    <link rel="shortcut icon" href="images/favicon.png">
+    <link rel="shortcut icon" href="/images/icon.png">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.blue_grey-pink.min.css">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
   </head>
 
 	<body>
-
 		<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
 
-		<header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
-			<div class="mdl-layout__header-row">
-				<span class="mdl-layout-title">
-					<?php echo ucfirst($site); ?>
-				</span>
-
-				<div class="mdl-layout-spacer"></div>
-
-			</div>
-		</header>
+			<header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
+				<div class="mdl-layout__header-row">
+					<span class="mdl-layout-title"><?php echo ucfirst($site); ?></span>
+					<div class="mdl-layout-spacer"></div>
+				</div>
+			</header>
 
 
+			<div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
 
-
-
-
-		<div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
-
-			<header class="demo-drawer-header">
-          <div class="demo-avatar-dropdown">
-
+				<header class="demo-drawer-header">
+					<div class="demo-avatar-dropdown">
 						<?php
 							if($user->isLogin()) {
 
@@ -75,7 +81,7 @@ $message = $user->getMessage();
 									'<div class="mdl-layout-spacer"></div>
 
 									<button class="mdl-button mdl-js-button mdl-button--icon" onclick="location.href=' . "'/konto'" . ';" id="button-konto">
-  									<i class="material-icons">settings</i>
+										<i class="material-icons">settings</i>
 									</button>
 									<div class="mdl-tooltip" for="button-konto">Ustawienia konta</div>
 
@@ -92,35 +98,30 @@ $message = $user->getMessage();
 							} else {
 								echo '<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onclick="location.href=' . "'logowanie'" . ';">Zaloguj się</button>';
 							}
-
 						?>
+					</div>
+				</header>
+
+
+				<nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
+					<a class="mdl-navigation__link" href="/panel"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">dashboard</i>Panel</a>
+					<a class="mdl-navigation__link" href="/archiwum"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">archive</i>Archiwum</a>
+					<a class="mdl-navigation__link" href="/ustawienia"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">settings</i>Ustawienia</a>
+					<div class="mdl-layout-spacer"></div>
+					<a class="mdl-navigation__link" href="/kontakt"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">contact_phone</i>Kontakt</a>
+					<a class="mdl-navigation__link" href="/licencje"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">copyright</i>Licencje</a>
+				</nav>
+
+			</div>
 
 
 
-          </div>
-        </header>
-
-
-			<nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
-				<a class="mdl-navigation__link" href="/panel"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">dashboard</i>Panel</a>
-				<a class="mdl-navigation__link" href="/archiwum"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">archive</i>Archiwum</a>
-				<a class="mdl-navigation__link" href="/ustawienia"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">settings</i>Ustawienia</a>
-				<div class="mdl-layout-spacer"></div>
-				<a class="mdl-navigation__link" href="/kontakt"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">contact_phone</i>Kontakt</a>
-				<a class="mdl-navigation__link" href="/licencje"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">copyright</i>Licencje</a>
-			</nav>
-		</div>
-
-
-
-			<main class="mdl-layout__content mdl-color--grey-100" style="display:flex;">
-				<?php
-					$file = "sites/" . $site . ".php";
-					if(file_exists($file)) include_once($file);
-				?>
+			<main class="mdl-layout__content mdl-color--grey-100">
+					<?php if(file_exists($file)) include_once($file); ?>
 			</main>
 
 		</div>
+
 
 		<script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
 
