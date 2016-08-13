@@ -1,11 +1,10 @@
 <?php
-require('php/RtUsers.php');
+require('php/RntUsers.php');
 
-$user = new RtUsers();
+$user = new RntUsers();
 $message = $user->getMessage();
 
 $sitesDir = "sites/";
-
 
 if(isset($_GET['site'])) {
 

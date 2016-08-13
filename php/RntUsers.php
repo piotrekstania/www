@@ -1,6 +1,6 @@
 <?php
 
-class RtUsers {
+class RntUsers {
 
 	private $db_dir          = "data.db";
 	private $db_table_users  = "users";
