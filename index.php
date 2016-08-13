@@ -23,6 +23,11 @@ if(isset($_GET['site'])) {
 	$file = $sitesDir . $site . ".php";
 }
 
+if(($site == "logowanie") && $user->isLogin()) {
+	header("Location: /panel");
+	die();
+}
+
 ?>
 <!doctype html>
 <!--
@@ -55,13 +60,114 @@ if(isset($_GET['site'])) {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.blue_grey-pink.min.css">
-    <link rel="stylesheet" href="/css/styles.css">
+
+		<style>
+
+			html, body {
+				font-family: 'Roboto', 'Helvetica', sans-serif;
+			}
+			.rnt-login-textfiled {
+				width: 100%;
+			}
+			.rnt-card-title-text {
+				font-weight: 400;
+				color: white;
+			}
+			.rnt-layout .rnt-header .mdl-textfield {
+			  padding: 0px;
+			  margin-top: 41px;
+			}
+			.rnt-layout .rnt-header .mdl-textfield .mdl-textfield__expandable-holder {
+			  bottom: 19px;
+			}
+			.rnt-layout .mdl-layout__header .mdl-layout__drawer-button {
+			  color: rgba(0, 0, 0, 0.54);
+			}
+			.mdl-layout__drawer .avatar {
+			  margin-bottom: 16px;
+			}
+			.rnt-drawer {
+			  border: none;
+			}
+			/* iOS Safari specific workaround */
+			.rnt-drawer .mdl-menu__container {
+			  z-index: -1;
+			}
+			.rnt-drawer .rnt-navigation {
+			  z-index: -2;
+			}
+			/* END iOS Safari specific workaround */
+			.rnt-drawer .mdl-menu .mdl-menu__item {
+			  display: -webkit-flex;
+			  display: -ms-flexbox;
+			  display: flex;
+			  -webkit-align-items: center;
+			      -ms-flex-align: center;
+			          align-items: center;
+			}
+			.rnt-drawer-header {
+			  box-sizing: border-box;
+			  display: -webkit-flex;
+			  display: -ms-flexbox;
+			  display: flex;
+			  -webkit-flex-direction: column;
+			      -ms-flex-direction: column;
+			          flex-direction: column;
+			  -webkit-justify-content: flex-end;
+			      -ms-flex-pack: end;
+			          justify-content: flex-end;
+			  padding: 16px;
+			}
+			.rnt-avatar-dropdown {
+			  display: -webkit-flex;
+			  display: -ms-flexbox;
+			  display: flex;
+			  position: relative;
+			  -webkit-flex-direction: row;
+			      -ms-flex-direction: row;
+			          flex-direction: row;
+			  -webkit-align-items: center;
+			      -ms-flex-align: center;
+			          align-items: center;
+			  width: 100%;
+				justify-content: center;
+			}
+
+			.rnt-navigation {
+			  -webkit-flex-grow: 1;
+			      -ms-flex-positive: 1;
+			          flex-grow: 1;
+			}
+			.rnt-layout .rnt-navigation .mdl-navigation__link {
+			  display: -webkit-flex !important;
+			  display: -ms-flexbox !important;
+			  display: flex !important;
+			  -webkit-flex-direction: row;
+			      -ms-flex-direction: row;
+			          flex-direction: row;
+			  -webkit-align-items: center;
+			      -ms-flex-align: center;
+			          align-items: center;
+			  color: rgba(255, 255, 255, 0.56);
+			  font-weight: 500;
+			}
+			.rnt-layout .rnt-navigation .mdl-navigation__link:hover {
+			  background-color: #00BCD4;
+			  color: #37474F;
+			}
+			.rnt-navigation .mdl-navigation__link .material-icons {
+			  font-size: 24px;
+			  color: rgba(255, 255, 255, 0.56);
+			  margin-right: 32px;
+			}
+
+		</style>
   </head>
 
 	<body>
-		<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+		<div class="rnt-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
 
-			<header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
+			<header class="rnt-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
 				<div class="mdl-layout__header-row">
 					<span class="mdl-layout-title"><?php echo ucfirst($site); ?></span>
 					<div class="mdl-layout-spacer"></div>
@@ -69,10 +175,10 @@ if(isset($_GET['site'])) {
 			</header>
 
 
-			<div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
+			<div class="rnt-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
 
-				<header class="demo-drawer-header">
-					<div class="demo-avatar-dropdown">
+				<header class="rnt-drawer-header">
+					<div class="rnt-avatar-dropdown">
 						<?php
 							if($user->isLogin()) {
 
@@ -103,7 +209,7 @@ if(isset($_GET['site'])) {
 				</header>
 
 
-				<nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
+				<nav class="rnt-navigation mdl-navigation mdl-color--blue-grey-800">
 					<a class="mdl-navigation__link" href="/panel"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">dashboard</i>Panel</a>
 					<a class="mdl-navigation__link" href="/archiwum"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">archive</i>Archiwum</a>
 					<a class="mdl-navigation__link" href="/ustawienia"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">settings</i>Ustawienia</a>

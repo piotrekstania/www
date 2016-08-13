@@ -1,11 +1,3 @@
-<?php
-if($user->isLogin()) {
-	header("Location: /");
-	die();
-}
-?>
-
-
 <div class="mdl-grid" style="max-width:1000px;">
 	<div class="mdl-card mdl-cell mdl-cell--8-col mdl-shadow--4dp mdl-cell--2-offset-desktop mdl-cell--middle">
 
